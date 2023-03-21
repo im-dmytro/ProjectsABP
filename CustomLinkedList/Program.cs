@@ -30,25 +30,21 @@ class LinkedEnumerator<T> : IEnumerator<T>
 
     public bool MoveNext()
     {
-        
-            if (CurrentNode == null&& Head != null)
-            {
-                Current = Head.Value;
-                CurrentNode = Head;
+
+        if (CurrentNode == null && Head != null)
+        {
+            Current = Head.Value;
+            CurrentNode = Head;
             return true;
         }
-            else if(CurrentNode.Next!=null)
-            { Current = CurrentNode.Next.Value; CurrentNode = CurrentNode.Next; return true; }
-            
-        
-
+        else if (CurrentNode.Next != null)
+        { Current = CurrentNode.Next.Value; CurrentNode = CurrentNode.Next; return true; }
 
         return false;
     }
     public void Reset()
     {
         CurrentNode = null;
-
     }
 }
 class LinkedListEnumerator<T> : IEnumerator<LinkedListNode<T>>
