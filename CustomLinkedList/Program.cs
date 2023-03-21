@@ -3,6 +3,54 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+class LinkedEnumerator<T> : IEnumerator<T>
+{
+    LinkedListNode<T>? Head;
+    LinkedListNode<T>? CurrentNode;
+
+    public LinkedEnumerator(LinkedListNode<T> first)
+    {
+        Head = first;
+    }
+    T _current;
+    public T? Current
+    {
+        get { return _current; }
+        set { _current = value; }
+    }
+
+    object? IEnumerator.Current
+    {
+        get { return _current; }
+    }
+
+    public void Dispose()
+    {
+    }
+
+    public bool MoveNext()
+    {
+        
+            if (CurrentNode == null&& Head != null)
+            {
+                Current = Head.Value;
+                CurrentNode = Head;
+            return true;
+        }
+            else if(CurrentNode.Next!=null)
+            { Current = CurrentNode.Next.Value; CurrentNode = CurrentNode.Next; return true; }
+            
+        
+
+
+        return false;
+    }
+    public void Reset()
+    {
+        CurrentNode = null;
+
+    }
+}
 class LinkedListEnumerator<T> : IEnumerator<LinkedListNode<T>>
 {
     LinkedListNode<T>? Head;
@@ -44,7 +92,7 @@ class LinkedListEnumerator<T> : IEnumerator<LinkedListNode<T>>
     }
 }
 
-class LinkedList<T> : IEnumerable<LinkedListNode<T>>
+class CusLinkedList<T> : IEnumerable<T>
 {
     public LinkedListNode<T>? Head { get; set; }
     public int Count { get; set; }
@@ -178,6 +226,11 @@ class LinkedList<T> : IEnumerable<LinkedListNode<T>>
     {
         return GetEnumerator();
     }
+
+    IEnumerator<T> IEnumerable<T>.GetEnumerator()
+    {
+        return new LinkedEnumerator<T>(Head);
+    }
 }
 class LinkedListNode<T>
 {
@@ -193,52 +246,54 @@ class Program
 {
     public static void Main(string[] args)
     {
-        LinkedList<int> linkedList = new LinkedList<int>();
+        CusLinkedList<int> linkedList = new CusLinkedList<int>();
 
         linkedList.AddFirst(6);
 
-        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+        Console.WriteLine(String.Join(" ", linkedList.ToArray()));
 
         linkedList.AddFirst(8);
 
-        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+        // Console.WriteLine(String.Join(" ", linkedList));
 
         var newNode = linkedList.AddLast(9);
 
-        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+        //Console.WriteLine(String.Join(" ", linkedList));
 
         linkedList.AddFirst(43);
-        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+        //Console.WriteLine(String.Join(" ", linkedList));
 
         linkedList.RemoveLast();
 
-        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+        //Console.WriteLine(String.Join(" ", linkedList));
 
         linkedList.AddFirst(65);
 
-        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+        //Console.WriteLine(String.Join(" ", linkedList));
 
         linkedList.AddLast(6);
 
-        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+        //Console.WriteLine(String.Join(" ", linkedList));
 
         linkedList.AddAfter(newNode, 89);
 
-        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+        //Console.WriteLine(String.Join(" ", linkedList));
 
         linkedList.AddBefore(newNode, 63);
 
-        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+        //Console.WriteLine(String.Join(" ", linkedList));
 
 
         Console.WriteLine("Count" + linkedList.Count);
 
-        linkedList.RemoveFromBegin(6);
 
-        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
-
+        Console.WriteLine(String.Join(" ", linkedList));
         Console.WriteLine("Count" + linkedList.Count);
+        Console.WriteLine(linkedList.Min());
+        foreach (var item in linkedList)
+        {
 
-
+        }
+        Console.WriteLine(String.Join(" ", linkedList.Append(899)));
     }
 }
