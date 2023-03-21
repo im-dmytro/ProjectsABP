@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -23,7 +24,6 @@ class LinkedListEnumerator<T> : IEnumerator<LinkedListNode<T>>
 
     public void Dispose()
     {
-        Console.WriteLine("Disposed");
     }
 
     public bool MoveNext()
@@ -37,8 +37,6 @@ class LinkedListEnumerator<T> : IEnumerator<LinkedListNode<T>>
         }
 
         return false;
-
-
     }
     public void Reset()
     {
@@ -50,7 +48,34 @@ class LinkedList<T> : IEnumerable<LinkedListNode<T>>
 {
     public LinkedListNode<T>? Head { get; set; }
     public int Count { get; set; }
-    public void AddLast(T value)
+    public LinkedListNode<T> AddAfter(LinkedListNode<T> nodeToAddAfter, T valueToAdd)
+    {
+        LinkedListNode<T> addingNode = new LinkedListNode<T>(valueToAdd);
+
+        var next = nodeToAddAfter.Next;
+        if (next is not null) { next.Previous = addingNode; addingNode.Next = next; }
+
+        nodeToAddAfter.Next = addingNode;
+        addingNode.Previous = nodeToAddAfter;
+
+        Count++;
+
+        return addingNode;
+    }
+    public LinkedListNode<T> AddBefore(LinkedListNode<T> nodeToAddBefore, T valueToAdd)
+    {
+        LinkedListNode<T> addingNode = new LinkedListNode<T>(valueToAdd);
+
+        var previous = nodeToAddBefore.Previous;
+        if (previous is not null) { previous.Next = addingNode; addingNode.Previous = previous; }
+
+        nodeToAddBefore.Previous = addingNode;
+        addingNode.Next = nodeToAddBefore;
+        Count++;
+
+        return addingNode;
+    }
+    public LinkedListNode<T> AddLast(T value)
     {
         LinkedListNode<T> addingValue = new LinkedListNode<T>(value);
         if (Head is null)
@@ -70,22 +95,40 @@ class LinkedList<T> : IEnumerable<LinkedListNode<T>>
             Current.Next = addingValue;
         }
         Count++;
+        return addingValue;
+
+    }
+    public LinkedListNode<T> AddFirst(T value)
+    {
+        LinkedListNode<T> addingValue = new LinkedListNode<T>(value);
+        if (Head is null)
+        {
+            Head = addingValue;
+        }
+        else
+        {
+            addingValue.Next = Head;
+            Head.Previous = addingValue;
+            Head = addingValue;
+        }
+        Count++;
+        return addingValue;
     }
     public LinkedListNode<T>? Find(T valueToFind)
     {
-        LinkedListNode<T> aux;
+        LinkedListNode<T> founded;
 
         foreach (var currnet in this)
         {
-            aux = currnet;
-            if (EqualityComparer<T>.Default.Equals(aux.Value, valueToFind))
+            founded = currnet;
+            if (EqualityComparer<T>.Default.Equals(founded.Value, valueToFind))
             {
-                return aux;
+                return founded;
             }
         }
         return default;
     }
-    public void Remove(T value)
+    public void RemoveFromBegin(T value)
     {
         LinkedListNode<T> found = Find(value);
         if (found is null)
@@ -105,27 +148,32 @@ class LinkedList<T> : IEnumerable<LinkedListNode<T>>
         }
         Count--;
     }
-
-    public void AddFirst(T value)
+    public void RemoveFirst()
     {
-        LinkedListNode<T> addingValue = new LinkedListNode<T>(value);
-        if (Head is null)
-        {
-            Head = addingValue;
-        }
-        else
-        {
-            addingValue.Next = Head;
-            Head.Previous = addingValue;
-            Head = addingValue;
+        var next = Head.Next;
+        if (next is not null) { next.Previous = null; Head = next; }
+        else Head = null;
+        Count--;
+    }
+    public void RemoveLast()
+    {
+        LinkedListNode<T> current = null;
 
+        foreach (var node in this) current = node;
+
+        if (current is not null)
+        {
+            var prev = current.Previous;
+            if (prev is not null) prev.Next = null;
         }
-        Count++;
+        Count--;
     }
     public IEnumerator<LinkedListNode<T>> GetEnumerator()
     {
         return new LinkedListEnumerator<T>(Head);
     }
+
+
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
@@ -143,27 +191,54 @@ class LinkedListNode<T>
 }
 class Program
 {
-
     public static void Main(string[] args)
     {
-        LinkedList<int> first = new LinkedList<int>();
-        //first.AddLast(6);
-        //first.AddLast(8);
-        //first.AddLast(43);
-        //first.AddLast(65);
+        LinkedList<int> linkedList = new LinkedList<int>();
 
-        first.AddFirst(6);
-        first.AddFirst(8);
-        first.AddFirst(43);
-        first.AddFirst(65);
-        first.AddLast(6);
+        linkedList.AddFirst(6);
 
-        first.Remove(6);
-        first.Remove(6);
+        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
 
-        foreach (var item in first)
-        {
-            Console.WriteLine(item.Value);
-        }
+        linkedList.AddFirst(8);
+
+        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+
+        var newNode = linkedList.AddLast(9);
+
+        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+
+        linkedList.AddFirst(43);
+        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+
+        linkedList.RemoveLast();
+
+        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+
+        linkedList.AddFirst(65);
+
+        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+
+        linkedList.AddLast(6);
+
+        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+
+        linkedList.AddAfter(newNode, 89);
+
+        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+
+        linkedList.AddBefore(newNode, 63);
+
+        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+
+
+        Console.WriteLine("Count" + linkedList.Count);
+
+        linkedList.RemoveFromBegin(6);
+
+        Console.WriteLine(String.Join(" ", linkedList.Select(x => x.Value)));
+
+        Console.WriteLine("Count" + linkedList.Count);
+
+
     }
 }
